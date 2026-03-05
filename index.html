@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QCORE AI Wishlist</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a2e;
+    --paper: #f5f0e8;
+    --gold: #c9a84c;
+    --gold-light: #e8d5a3;
+    --cream: #faf7f2;
+    --muted: #8a8070;
+    --card-bg: #ffffff;
+    --shadow: 0 2px 20px rgba(26,26,46,0.08);
+    --shadow-hover: 0 8px 40px rgba(26,26,46,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    background-image: 
+      radial-gradient(ellipse at 10% 20%, rgba(201,168,76,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse at 90% 80%, rgba(201,168,76,0.05) 0%, transparent 60%);
+  }
+
+  header {
+    background: var(--ink);
+    padding: 28px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 30px rgba(0,0,0,0.3);
+  }
+
+  .logo { display: flex; align-items: baseline; gap: 12px; }
+  .logo-q { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--gold); letter-spacing: -1px; }
+  .logo-text { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.5); letter-spacing: 3px; text-transform: uppercase; }
+
+  .header-right { display: flex; align-items: center; gap: 16px; }
+  .header-badge {
+    background: rgba(201,168,76,0.15);
+    border: 1px solid rgba(201,168,76,0.3);
+    color: var(--gold-light);
+    font-size: 12px; font-weight: 500;
+    padding: 6px 14px; border-radius: 20px; letter-spacing: 1px;
+  }
+  .loading-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--gold); opacity: 0.5;
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:0.3} 50%{opacity:1} }
+
+  .hero { padding: 56px 48px 40px; max-width: 1100px; margin: 0 auto; }
+  .hero-eyebrow {
+    font-size: 11px; font-weight: 600; letter-spacing: 4px;
+    text-transform: uppercase; color: var(--gold);
+    margin-bottom: 16px; display: flex; align-items: center; gap: 10px;
+  }
+  .hero-eyebrow::before { content:''; display:block; width:32px; height:1px; background:var(--gold); }
+  .hero h1 { font-family: 'DM Serif Display', serif; font-size: clamp(38px, 5vw, 58px); line-height: 1.1; color: var(--ink); margin-bottom: 16px; max-width: 700px; }
+  .hero h1 em { color: var(--gold); font-style: italic; }
+  .hero p { font-size: 16px; line-height: 1.7; color: var(--muted); max-width: 560px; font-weight: 300; }
+
+  .stats-bar { max-width: 1100px; margin: 0 auto 48px; padding: 0 48px; display: flex; }
+  .stat { flex: 1; padding: 22px 28px; border-top: 2px solid var(--gold); background: var(--card-bg); }
+  .stat:first-child { border-radius: 12px 0 0 12px; }
+  .stat:last-child { border-radius: 0 12px 12px 0; }
+  .stat + .stat { border-left: 1px solid rgba(0,0,0,0.06); }
+  .stat-num { font-family: 'DM Serif Display', serif; font-size: 30px; color: var(--ink); line-height: 1; margin-bottom: 4px; }
+  .stat-label { font-size: 11px; color: var(--muted); font-weight: 500; letter-spacing: 1px; text-transform: uppercase; }
+
+  .main { max-width: 1100px; margin: 0 auto; padding: 0 48px 80px; display: grid; grid-template-columns: 1fr 320px; gap: 32px; align-items: start; }
+
+  .wishes-section h2 { font-family: 'DM Serif Display', serif; font-size: 22px; margin-bottom: 20px; color: var(--ink); }
+
+  .filters { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+  .filter-btn {
+    padding: 7px 16px; border-radius: 20px;
+    border: 1.5px solid rgba(26,26,46,0.15);
+    background: transparent; font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 500; color: var(--muted);
+    cursor: pointer; transition: all 0.2s;
+  }
+  .filter-btn:hover, .filter-btn.active { border-color: var(--gold); background: var(--gold); color: white; }
+
+  .wish-card {
+    background: var(--card-bg); border-radius: 16px; padding: 26px 30px;
+    margin-bottom: 14px; box-shadow: var(--shadow); transition: all 0.3s;
+    border: 1px solid rgba(26,26,46,0.04); position: relative; overflow: hidden;
+    animation: slideIn 0.4s ease both;
+  }
+  @keyframes slideIn { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+  .wish-card::before {
+    content:''; position:absolute; left:0; top:0; bottom:0; width:4px;
+    background:var(--gold); border-radius:4px 0 0 4px;
+    transform:scaleY(0); transition:transform 0.2s; transform-origin:bottom;
+  }
+  .wish-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+  .wish-card:hover::before { transform: scaleY(1); }
+  .wish-card.featured { background: linear-gradient(135deg, #1a1a2e 0%, #2d2d4a 100%); color: white; }
+  .wish-card.featured::before { background: var(--gold); }
+
+  .wish-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+  .wish-category { font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); }
+  .wish-card.featured .wish-category { background: rgba(201,168,76,0.2); padding: 3px 8px; border-radius: 4px; }
+
+  .vote-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border-radius: 20px;
+    border: 1.5px solid rgba(26,26,46,0.12);
+    background: transparent; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+    color: var(--muted); transition: all 0.2s; white-space: nowrap;
+  }
+  .wish-card.featured .vote-btn { border-color: rgba(255,255,255,0.2); color: rgba(255,255,255,0.7); }
+  .vote-btn:hover { border-color: #ef4444; color: #ef4444; background: rgba(239,68,68,0.06); }
+  .vote-btn.voted { border-color: #ef4444; background: rgba(239,68,68,0.1); color: #ef4444; }
+  .vote-btn.voted .heart { animation: heartPop 0.3s cubic-bezier(0.36,0.07,0.19,0.97); }
+  @keyframes heartPop { 0%{transform:scale(1)} 50%{transform:scale(1.4)} 100%{transform:scale(1)} }
+  .vote-btn.loading-vote { opacity: 0.5; pointer-events: none; }
+
+  .wish-title { font-family: 'DM Serif Display', serif; font-size: 19px; line-height: 1.3; margin-bottom: 8px; color: var(--ink); }
+  .wish-card.featured .wish-title { color: white; }
+  .wish-desc { font-size: 14px; line-height: 1.65; color: var(--muted); margin-bottom: 20px; }
+  .wish-card.featured .wish-desc { color: rgba(255,255,255,0.6); }
+
+  .wish-footer { display: flex; justify-content: space-between; align-items: center; }
+  .wish-author { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); font-weight: 500; }
+  .wish-card.featured .wish-author { color: rgba(255,255,255,0.5); }
+  .avatar { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: white; letter-spacing: 0.5px; }
+
+  .wish-status { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 10px; letter-spacing: 0.5px; }
+  .status-new { background: rgba(34,197,94,0.1); color: #16a34a; }
+  .status-review { background: rgba(234,179,8,0.1); color: #ca8a04; }
+  .status-building { background: rgba(59,130,246,0.1); color: #2563eb; }
+
+  /* SIDEBAR */
+  .sidebar { position: sticky; top: 100px; }
+  .add-wish-card {
+    background: var(--ink); border-radius: 20px; padding: 32px 28px;
+    color: white; margin-bottom: 20px;
+  }
+  .add-wish-card h3 { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--gold-light); margin-bottom: 8px; }
+  .add-wish-card > p { font-size: 14px; color: rgba(255,255,255,0.45); margin-bottom: 24px; line-height: 1.6; }
+
+  .form-group { margin-bottom: 16px; }
+  .form-label { display: block; font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 8px; }
+  .form-input, .form-select, .form-textarea {
+    width: 100%; padding: 11px 14px; border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.07); color: white;
+    font-family: 'DM Sans', sans-serif; font-size: 14px;
+    outline: none; transition: border-color 0.2s;
+  }
+  .form-input::placeholder, .form-textarea::placeholder { color: rgba(255,255,255,0.25); }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--gold); }
+  .form-select option { background: #1a1a2e; color: white; }
+  .form-textarea { resize: vertical; min-height: 90px; }
+
+  .submit-btn {
+    width: 100%; padding: 13px; border-radius: 12px;
+    background: var(--gold); border: none; color: var(--ink);
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; letter-spacing: 0.5px; margin-top: 4px;
+  }
+  .submit-btn:hover { background: var(--gold-light); transform: translateY(-1px); }
+  .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .idea-box { background: var(--card-bg); border-radius: 16px; padding: 24px; box-shadow: var(--shadow); }
+  .idea-box h4 { font-family: 'DM Serif Display', serif; font-size: 16px; margin-bottom: 16px; color: var(--ink); }
+  .idea-item { display: flex; gap: 12px; margin-bottom: 14px; }
+  .idea-icon { width: 32px; height: 32px; border-radius: 8px; background: rgba(201,168,76,0.1); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .idea-text { font-size: 13px; color: var(--muted); line-height: 1.5; padding-top: 6px; }
+
+  .skeleton {
+    background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 8px;
+    height: 16px; margin-bottom: 8px;
+  }
+  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+  .skeleton-card {
+    background: var(--card-bg); border-radius: 16px; padding: 26px 30px;
+    margin-bottom: 14px; box-shadow: var(--shadow);
+  }
+
+  .toast {
+    position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: var(--ink); color: var(--gold-light);
+    padding: 14px 24px; border-radius: 12px; font-size: 14px; font-weight: 500;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2); transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    z-index: 1000; white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
+  .empty-state h3 { font-family: 'DM Serif Display', serif; font-size: 24px; margin-bottom: 8px; color: var(--ink); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <span class="logo-q">QCORE</span>
+    <span class="logo-text">AI Wishlist</span>
+  </div>
+  <div class="header-right">
+    <div class="loading-dot" id="sync-dot" title="Synced with team"></div>
+    <span class="header-badge">Live · Shared</span>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-eyebrow">QCORE Fund Management</div>
+  <h1>What should <em>AI</em> build next?</h1>
+  <p>Submit your ideas, vote for what matters most — and we'll build the most popular wishes together.</p>
+</div>
+
+<div class="stats-bar">
+  <div class="stat">
+    <div class="stat-num" id="total-count">—</div>
+    <div class="stat-label">Total Wishes</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num" id="vote-count">—</div>
+    <div class="stat-label">Total Votes</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num" id="building-count">—</div>
+    <div class="stat-label">In Development</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">16</div>
+    <div class="stat-label">Team Members</div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="wishes-section">
+    <h2>All Wishes</h2>
+    <div class="filters">
+      <button class="filter-btn active" onclick="filterCards('all', this)">All</button>
+      <button class="filter-btn" onclick="filterCards('Meetings', this)">Meetings</button>
+      <button class="filter-btn" onclick="filterCards('Reporting', this)">Reporting</button>
+      <button class="filter-btn" onclick="filterCards('Communication', this)">Communication</button>
+      <button class="filter-btn" onclick="filterCards('Accounting', this)">Accounting</button>
+    </div>
+    <div id="wish-list">
+      <!-- Skeleton loaders -->
+      <div class="skeleton-card" id="sk1"><div class="skeleton" style="width:30%;height:10px"></div><div class="skeleton" style="width:70%;height:20px;margin-top:12px"></div><div class="skeleton" style="width:100%;height:14px;margin-top:8px"></div><div class="skeleton" style="width:85%"></div></div>
+      <div class="skeleton-card" id="sk2"><div class="skeleton" style="width:25%;height:10px"></div><div class="skeleton" style="width:60%;height:20px;margin-top:12px"></div><div class="skeleton" style="width:100%;height:14px;margin-top:8px"></div><div class="skeleton" style="width:80%"></div></div>
+      <div class="skeleton-card" id="sk3"><div class="skeleton" style="width:35%;height:10px"></div><div class="skeleton" style="width:75%;height:20px;margin-top:12px"></div><div class="skeleton" style="width:100%;height:14px;margin-top:8px"></div><div class="skeleton" style="width:90%"></div></div>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <div class="add-wish-card">
+      <h3>Submit a Wish</h3>
+      <p>Have an idea? Write it down — every voice counts.</p>
+      <div class="form-group">
+        <label class="form-label">Your Name</label>
+        <input type="text" class="form-input" placeholder="e.g. Felix V." id="input-name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select class="form-select" id="input-cat">
+          <option value="Meetings">Meetings</option>
+          <option value="Reporting">Reporting</option>
+          <option value="Communication">Communication</option>
+          <option value="Accounting">Accounting</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Wish Title</label>
+        <input type="text" class="form-input" placeholder="Short & to the point" id="input-title">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-textarea" placeholder="What exactly should the AI do?" id="input-desc"></textarea>
+      </div>
+      <button class="submit-btn" id="submit-btn" onclick="submitWish()">✦ Submit Wish</button>
+    </div>
+
+    <div class="idea-box">
+      <h4>How it works</h4>
+      <div class="idea-item">
+        <div class="idea-icon">💡</div>
+        <div class="idea-text"><strong>Submit an idea</strong> — Describe what you want AI to do.</div>
+      </div>
+      <div class="idea-item">
+        <div class="idea-icon">♥</div>
+        <div class="idea-text"><strong>Vote</strong> — Support the ideas you care about most.</div>
+      </div>
+      <div class="idea-item">
+        <div class="idea-icon">⚡</div>
+        <div class="idea-text"><strong>Build</strong> — The most popular wishes get built first.</div>
+      </div>
+      <div class="idea-item">
+        <div class="idea-icon">🚀</div>
+        <div class="idea-text"><strong>Launch</strong> — Finished tools roll out to the whole team.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Default wishes (shown on first load before storage) ──────────────────────
+const DEFAULT_WISHES = [
+  {
+    id: 'w1', title: 'Meeting Minutes → Agenda → Distribution',
+    desc: 'An assistant that automatically summarises our meeting minutes, creates an agenda for the next meeting, and sends it to all participants on the morning of the meeting.',
+    category: 'Meetings', author: 'Justus K.', authorColor: '#c9a84c', authorInitials: 'JK',
+    status: 'building', votes: 0, featured: true, ts: 1
+  },
+  {
+    id: 'w2', title: 'Monthly Fund Performance Report',
+    desc: 'AI automatically generates the monthly performance report for all funds, pulling data from Bloomberg and custodian statements and formatting everything in the QCORE template.',
+    category: 'Reporting', author: 'Julian M.', authorColor: '#3b82f6', authorInitials: 'JM',
+    status: 'review', votes: 0, featured: false, ts: 2
+  },
+  {
+    id: 'w3', title: 'Automated Credit Card Reconciliation',
+    desc: 'Automatic matching of UBS credit card statements against receipts stored in SharePoint — including a report of missing receipts per employee.',
+    category: 'Accounting', author: 'Felix V.', authorColor: '#10b981', authorInitials: 'FV',
+    status: 'building', votes: 0, featured: false, ts: 3
+  },
+  {
+    id: 'w4', title: 'Investor Update Assistant',
+    desc: 'An assistant that automatically drafts monthly investor updates in German and English from performance data and predefined key messages.',
+    category: 'Communication', author: 'Pedro C.', authorColor: '#8b5cf6', authorInitials: 'PC',
+    status: 'new', votes: 0, featured: false, ts: 4
+  },
+  {
+    id: 'w5', title: 'Due Diligence Summary',
+    desc: 'AI reads manager DD documents and automatically creates a standardised summary using the QCORE template — including a traffic-light risk assessment.',
+    category: 'Reporting', author: 'R.R.', authorColor: '#f59e0b', authorInitials: 'RR',
+    status: 'new', votes: 0, featured: false, ts: 5
+  }
+];
+
+const AVATAR_COLORS = ['#c9a84c','#3b82f6','#10b981','#8b5cf6','#f59e0b','#ef4444','#06b6d4','#ec4899'];
+let wishes = [];
+let userVotes = {}; // local only (per-session)
+let currentFilter = 'all';
+
+// ── Storage helpers ──────────────────────────────────────────────────────────
+async function loadData() {
+  try {
+    const result = await window.storage.get('wishlist-data', true);
+    if (result && result.value) {
+      const data = JSON.parse(result.value);
+      wishes = data.wishes || DEFAULT_WISHES;
+    } else {
+      wishes = JSON.parse(JSON.stringify(DEFAULT_WISHES));
+      await saveData();
+    }
+  } catch(e) {
+    wishes = JSON.parse(JSON.stringify(DEFAULT_WISHES));
+    try { await saveData(); } catch(e2) {}
+  }
+}
+
+async function saveData() {
+  try {
+    await window.storage.set('wishlist-data', JSON.stringify({ wishes, updatedAt: Date.now() }), true);
+    flashSync();
+  } catch(e) {}
+}
+
+function flashSync() {
+  const dot = document.getElementById('sync-dot');
+  dot.style.background = '#10b981';
+  dot.style.opacity = '1';
+  setTimeout(() => { dot.style.background = ''; dot.style.opacity = ''; }, 1000);
+}
+
+// ── Render ───────────────────────────────────────────────────────────────────
+function render() {
+  // Remove skeletons
+  ['sk1','sk2','sk3'].forEach(id => { const el = document.getElementById(id); if(el) el.remove(); });
+
+  const list = document.getElementById('wish-list');
+  const visible = currentFilter === 'all' ? wishes : wishes.filter(w => w.category === currentFilter);
+
+  // Sort: featured first, then by votes desc
+  const sorted = [...visible].sort((a,b) => {
+    if(a.featured && !b.featured) return -1;
+    if(!a.featured && b.featured) return 1;
+    return b.votes - a.votes;
+  });
+
+  // Remove existing cards (not skeletons)
+  list.querySelectorAll('.wish-card').forEach(el => el.remove());
+
+  if(sorted.length === 0) {
+    list.innerHTML = '<div class="empty-state"><h3>No wishes yet</h3><p>Be the first to submit an idea in this category!</p></div>';
+  } else {
+    sorted.forEach((w, i) => {
+      const card = createCard(w, i);
+      list.appendChild(card);
+    });
+  }
+
+  updateStats();
+}
+
+function createCard(w, delay) {
+  const statusMap = { new: 'status-new', review: 'status-review', building: 'status-building' };
+  const statusLabel = { new: '● New', review: '◐ Under Review', building: '⬤ In Development' };
+  const voted = userVotes[w.id];
+
+  const card = document.createElement('div');
+  card.className = 'wish-card' + (w.featured ? ' featured' : '');
+  card.dataset.category = w.category;
+  card.style.animationDelay = (delay * 0.06) + 's';
+  card.innerHTML = `
+    <div class="wish-header">
+      <span class="wish-category">${w.featured ? '✦ ' : ''}${w.category}</span>
+      <button class="vote-btn ${voted ? 'voted' : ''}" onclick="toggleVote('${w.id}', this)">
+        <span class="heart">${voted ? '♥' : '♡'}</span>
+        <span class="vote-num">${w.votes}</span>
+      </button>
+    </div>
+    <div class="wish-title">${escHtml(w.title)}</div>
+    <div class="wish-desc">${escHtml(w.desc)}</div>
+    <div class="wish-footer">
+      <div class="wish-author">
+        <div class="avatar" style="background:${w.authorColor}">${w.authorInitials}</div>
+        ${escHtml(w.author)}
+      </div>
+      <span class="wish-status ${statusMap[w.status]}">${statusLabel[w.status]}</span>
+    </div>
+  `;
+  return card;
+}
+
+function updateStats() {
+  document.getElementById('total-count').textContent = wishes.length;
+  document.getElementById('vote-count').textContent = wishes.reduce((s,w) => s + (w.votes||0), 0);
+  document.getElementById('building-count').textContent = wishes.filter(w => w.status === 'building').length;
+}
+
+// ── Vote ─────────────────────────────────────────────────────────────────────
+async function toggleVote(id, btn) {
+  btn.classList.add('loading-vote');
+  const w = wishes.find(w => w.id === id);
+  if(!w) return;
+
+  if(userVotes[id]) {
+    delete userVotes[id];
+    w.votes = Math.max(0, (w.votes||0) - 1);
+  } else {
+    userVotes[id] = true;
+    w.votes = (w.votes||0) + 1;
+  }
+
+  await saveData();
+  render();
+}
+
+// ── Filter ───────────────────────────────────────────────────────────────────
+function filterCards(cat, btn) {
+  currentFilter = cat;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+// ── Submit ───────────────────────────────────────────────────────────────────
+async function submitWish() {
+  const name = document.getElementById('input-name').value.trim();
+  const cat = document.getElementById('input-cat').value;
+  const title = document.getElementById('input-title').value.trim();
+  const desc = document.getElementById('input-desc').value.trim();
+
+  if(!name || !title || !desc) { showToast('⚠ Please fill in all fields.'); return; }
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+
+  const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+  const color = AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)];
+
+  const newWish = {
+    id: 'w' + Date.now(),
+    title, desc, category: cat,
+    author: name, authorColor: color, authorInitials: initials,
+    status: 'new', votes: 0, featured: false, ts: Date.now()
+  };
+
+  wishes.push(newWish);
+  await saveData();
+
+  // Reset form
+  document.getElementById('input-name').value = '';
+  document.getElementById('input-title').value = '';
+  document.getElementById('input-desc').value = '';
+  btn.disabled = false;
+  btn.textContent = '✦ Submit Wish';
+
+  // Show in current filter if matches
+  if(currentFilter !== 'all' && currentFilter !== cat) {
+    currentFilter = 'all';
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('.filter-btn').classList.add('active');
+  }
+
+  render();
+  showToast('✦ Your wish has been submitted!');
+}
+
+// ── Utils ────────────────────────────────────────────────────────────────────
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+(async function init() {
+  await loadData();
+  render();
+
+  // Poll for updates every 30s
+  setInterval(async () => {
+    const prev = JSON.stringify(wishes.map(w => w.votes));
+    await loadData();
+    if(JSON.stringify(wishes.map(w => w.votes)) !== prev) render();
+  }, 30000);
+})();
+</script>
+</body>
+</html>
